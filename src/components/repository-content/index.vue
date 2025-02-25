@@ -15,7 +15,7 @@
   {{ selectedRepository?.name }}
   <svg-icon name="share" class="text-sm" />
   <span class="ml-2 text-sm text-gray-500">
-    Last commit: {{ getLastCommitTimestamp(selectedRepository) }}
+    Last commit: {{ lastCommitTimestamp }}
   </span>
 </h2>
       </a>
@@ -58,11 +58,13 @@ const { selectedRepository } = storeToRefs(useRepositoryStore());
 const readme = ref('');
 const refReadme = ref(null);
 const loading = ref(false);
+const lastCommitTimestamp = ref('');
 
 watchEffect(async () => {
   if (!selectedRepository.value) return;
   readme.value = '';
   loading.value = true;
+  lastCommitTimestamp.value = '';
 
   // 暂存 repository id
   const { id } = selectedRepository.value;
@@ -117,6 +119,9 @@ watchEffect(async () => {
       const b = toRepostoryReadmeHref(p1, { urlPrefix });
       return (a + b).replace('/blob/', '/raw/');
     });
+
+  const timestamp = await getLastCommitTimestamp(selectedRepository.value);
+  lastCommitTimestamp.value = timestamp;
 
   nextTick(() => {
     refReadme.value.scrollTo({ top: 0 });
