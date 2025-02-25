@@ -9,12 +9,15 @@
         class="inline-flex items-center hover:underline"
         rel="noopener noreferrer"
       >
-        <h2 class="text-lg font-bold">
-          <svg-icon name="github" class="text-xl" />
-          {{ selectedRepository?.owner.login }} /
-          {{ selectedRepository?.name }}
-          <svg-icon name="share" class="text-sm" />
-        </h2>
+<h2 class="text-lg font-bold">
+  <svg-icon name="github" class="text-xl" />
+  {{ selectedRepository?.owner.login }} /
+  {{ selectedRepository?.name }}
+  <svg-icon name="share" class="text-sm" />
+  <span class="ml-2 text-sm text-gray-500">
+    Last commit: {{ getLastCommitTimestamp(selectedRepository) }}
+  </span>
+</h2>
       </a>
     </header>
 
@@ -48,7 +51,7 @@
 import { watchEffect, ref, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRepositoryStore } from '@/store/repository';
-import { getRepositoryReadme, getReadmeByMarkdown } from '@/server/github';
+import { getRepositoryReadme, getReadmeByMarkdown, getLastCommitTimestamp } from '@/server/github';
 import { toRepostoryReadmeHref } from './tool';
 
 const { selectedRepository } = storeToRefs(useRepositoryStore());

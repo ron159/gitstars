@@ -4,6 +4,15 @@ export async function getUserInfo() {
   return httpRequestGithub.get('/user');
 }
 
+export async function getLastCommitTimestamp(params) {
+  const { owner, name } = params;
+  const res = await httpRequestGithub.get(`/repos/${owner}/${name}/commits`);
+  if (res.data && res.data.length > 0) {
+    return res.data[0].commit.author.date;
+  }
+  return null;
+}
+
 export async function getStarredRepositories(params) {
   return httpRequestGithub.get('/user/starred', { params });
 }
