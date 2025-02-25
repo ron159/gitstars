@@ -120,8 +120,13 @@ watchEffect(async () => {
       return (a + b).replace('/blob/', '/raw/');
     });
 
-  const timestamp = await getLastCommitTimestamp(selectedRepository.value);
-  lastCommitTimestamp.value = timestamp;
+const timestamp = await getLastCommitTimestamp(selectedRepository.value);
+if (timestamp) {
+  const date = new Date(timestamp);
+  lastCommitTimestamp.value = date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+} else {
+  lastCommitTimestamp.value = 'No commits found';
+}
 
   nextTick(() => {
     refReadme.value.scrollTo({ top: 0 });
