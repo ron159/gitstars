@@ -5,12 +5,20 @@ export async function getUserInfo() {
 }
 
 export async function getLastCommitTimestamp(params) {
-  const { owner, name } = params;
-  const res = await httpRequestGithub.get(`/repos/${owner}/${name}/commits`);
-  if (res.data && res.data.length > 0) {
-    return res.data[0].commit.author.date;
+  try {
+    const { owner, name } = params;
+    const res = await httpRequestGithub.get(`/repos/${owner}/${name}/commits`);
+    if (res.data && res.data.length > 0) {
+      console.log('Last commit timestamp:', res.data[0].commit.author.date);
+      return res.data[0].commit.author.date;
+    } else {
+      console.log('No commits found for the repository.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error fetching last commit timestamp:', error);
+    return null;
   }
-  return null;
 }
 
 export async function getStarredRepositories(params) {
