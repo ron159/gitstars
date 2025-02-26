@@ -39,8 +39,15 @@ export async function getLastCommitTimestamp(repository) {
     }
     
     // 获取默认分支
-    const repoInfo = await httpRequestGithub.get(`/repos/${owner.login}/${name}`);
-    const defaultBranch = repoInfo.data.default_branch || 'main';
+    let defaultBranch = 'main';
+    try {
+      const repoInfo = await httpRequestGithub.get(`/repos/${owner.login}/${name}`);
+      if (repoInfo?.data?.default_branch) {
+        defaultBranch = repoInfo.data.default_branch;
+      }
+    } catch (error) {
+      console.warn('Failed to get default branch, using main as fallback:', error.message);
+    }
     
     const commitsUrl = `/repos/${owner.login}/${name}/commits`;
     console.log('Fetching commits from:', commitsUrl, 'on branch:', defaultBranch);
