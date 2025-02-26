@@ -14,11 +14,6 @@ export async function getLastCommitTimestamp(repository) {
       return null;
     }
 
-    // 调试信息
-    console.log('Owner:', owner);
-    console.log('Owner login:', owner.login);
-    console.log('Repository name:', name);
-
     // 检查token是否存在
     const userStore = useUserStore();
     if (!userStore.token) {
@@ -54,8 +49,7 @@ export async function getLastCommitTimestamp(repository) {
 
     // 尝试使用master分支
     const masterCommitsUrl = `/repos/${owner.login}/${name}/commits`;
-    console.log('Fetching commits from (master):', masterCommitsUrl);
-    try{
+    try {
       const masterRes = await httpRequestGithub.get(masterCommitsUrl, {
         headers: {
           Accept: 'application/vnd.github.v3+json',
@@ -68,20 +62,16 @@ export async function getLastCommitTimestamp(repository) {
       });
       if (masterRes && masterRes.length > 0) {
         const commitDate = masterRes[0].commit.author.date;
-        console.log('Last commit timestamp (master branch):', commitDate);
         return commitDate;
       }
     } catch (error) {
-       if (error.response?.status === 404){
-         console.warn('master branch not exists in repository:', masterCommitsUrl);
-       } else {
-          console.error('Error fetching master commits from:', masterCommitsUrl,error);
-       }
+      if (error.response?.status === 404) {
+        console.warn('master branch not exists in repository:', masterCommitsUrl);
+      }
     }
 
     //尝试其他分支
     const commitsUrl = `/repos/${owner.login}/${name}/commits`;
-    console.log('Fetching commits from (default):', commitsUrl, 'on branch:', defaultBranch);
     try {
       const res = await httpRequestGithub.get(commitsUrl, {
         headers: {
@@ -95,20 +85,13 @@ export async function getLastCommitTimestamp(repository) {
       });
       if (res && res.length > 0) {
         const commitDate = res[0].commit.author.date;
-        console.log('Last commit timestamp:', commitDate);
         return commitDate;
       }
-
-    } catch(error){
-        if (error.response?.status === 404){
-          console.warn('default branch not exists in repository:', commitsUrl);
-        } else {
-          console.error('Error fetching default commits from:', commitsUrl,error);
-        }
+    } catch (error) {
+      if (error.response?.status === 404) {
+        console.warn('default branch not exists in repository:', commitsUrl);
+      }
     }
-    
-
-    console.log('No commits found for the repository.');
     return null;
   } catch (error) {
     if (error.response) {
@@ -125,7 +108,57 @@ export async function getLastCommitTimestamp(repository) {
 }
 
 export async function getStarredRepositories(params) {
-  return httpRequestGithub.get('/user/starred', { params });
+  const userStore = useUserStore();
+  if (!userStore.token) {
+    console.error('No GitHub token found');
+    return null;
+  }
+
+  let allRepos = [];
+  let page = 1;
+  let hasMore = true;
+
+  while (hasMore) {
+    const res = await httpRequestGithub.get('/user/starred', {
+      params: {
+        per_page: 100,
+        page: page,
+        ...params,
+      },
+    });
+
+    if (res && res.length > 0) {
+      allRepos = allRepos.concat(res);
+      page++;
+    } else {
+      hasMore = false;
+    }
+  }
+
+  // Extract relevant data, including forks_count
+  const formattedRepos = allRepos.map(item => ({
+    id: item.repo.id,
+    name: item.repo.name,
+    full_name: item.repo.full_name,
+    description: item.repo.description,
+    html_url: item.repo.html_url,
+    stargazers_count: item.repo.stargazers_count,
+    forks_count: item.repo.forks_count,
+    language: item.repo.language,
+    owner: item.repo.owner,
+  }));
+
+  const promises = formattedRepos.map(async (repo) => {
+    const timestamp = await getLastCommitTimestamp({ owner: repo.owner, name: repo.name });
+    return {
+      ...repo,
+      lastCommitTimestamp: timestamp,
+    };
+  });
+
+  const finalRepos = await Promise.all(promises);
+  console.log('get star repositorys :', finalRepos);
+  return finalRepos;
 }
 
 export async function getRepositoryReadme(params) {
