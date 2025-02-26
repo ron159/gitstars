@@ -6,8 +6,16 @@ export async function getUserInfo() {
 
 export async function getLastCommitTimestamp(repository) {
   try {
+    console.log('Repository object:', repository);
     const { owner, name } = repository;
-    const res = await httpRequestGithub.get(`/repos/${owner.login}/${name}/commits`, {
+    if (!owner || !owner.login || !name) {
+      console.error('Invalid repository object:', repository);
+      return null;
+    }
+    
+    const url = `/repos/${owner.login}/${name}/commits`;
+    console.log('Fetching commits from:', url);
+    const res = await httpRequestGithub.get(url, {
       params: {
         sha: 'main', // 默认使用main分支
         per_page: 1  // 只获取最新的commit
