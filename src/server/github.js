@@ -1,4 +1,5 @@
 import { httpRequestGithub } from './http-request';
+import { useUserStore } from '@/store/user';
 
 export async function getUserInfo() {
   return httpRequestGithub.get('/user');
@@ -10,6 +11,13 @@ export async function getLastCommitTimestamp(repository) {
     const { owner, name } = repository;
     if (!owner || !owner.login || !name) {
       console.error('Invalid repository object:', repository);
+      return null;
+    }
+    
+    // 检查token是否存在
+    const userStore = useUserStore();
+    if (!userStore.token) {
+      console.error('No GitHub token found');
       return null;
     }
     
