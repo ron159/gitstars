@@ -14,6 +14,11 @@ export async function getLastCommitTimestamp(repository) {
       return null;
     }
     
+    // 调试信息
+    console.log('Owner:', owner);
+    console.log('Owner login:', owner.login);
+    console.log('Repository name:', name);
+    
     // 检查token是否存在
     const userStore = useUserStore();
     if (!userStore.token) {
@@ -33,15 +38,19 @@ export async function getLastCommitTimestamp(repository) {
       throw error;
     }
     
+    // 获取默认分支
+    const repoInfo = await httpRequestGithub.get(`/repos/${owner.login}/${name}`);
+    const defaultBranch = repoInfo.data.default_branch || 'main';
+    
     const commitsUrl = `/repos/${owner.login}/${name}/commits`;
-    console.log('Fetching commits from:', commitsUrl);
+    console.log('Fetching commits from:', commitsUrl, 'on branch:', defaultBranch);
     const res = await httpRequestGithub.get(commitsUrl, {
       headers: {
         'Accept': 'application/vnd.github.v3+json'
       },
       params: {
-        sha: 'main', // 默认使用main分支
-        per_page: 1,  // 只获取最新的commit
+        sha: defaultBranch,
+        per_page: 1,
         page: 1
       }
     });
