@@ -28,9 +28,13 @@ export async function getLastCommitTimestamp(repository) {
     const commitsUrl = `/repos/${owner.login}/${name}/commits`;
     console.log('Fetching commits from:', commitsUrl);
     const res = await httpRequestGithub.get(commitsUrl, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json'
+      },
       params: {
         sha: 'main', // 默认使用main分支
-        per_page: 1  // 只获取最新的commit
+        per_page: 1,  // 只获取最新的commit
+        page: 1
       }
     });
     
