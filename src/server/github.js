@@ -135,30 +135,35 @@ export async function getStarredRepositories(params) {
     }
   }
 
-  // Extract relevant data, including forks_count
-  const formattedRepos = allRepos.map(item => ({
-    id: item.repo.id,
-    name: item.repo.name,
-    full_name: item.repo.full_name,
-    description: item.repo.description,
-    html_url: item.repo.html_url,
-    stargazers_count: item.repo.stargazers_count,
-    forks_count: item.repo.forks_count,
-    language: item.repo.language,
-    owner: item.repo.owner,
-  }));
-
-  const promises = formattedRepos.map(async (repo) => {
-    const timestamp = await getLastCommitTimestamp({ owner: repo.owner, name: repo.name });
+  // 先创建一个 promises 数组来获取所有仓库的最后提交时间
+  const timestampPromises = allRepos.map(async (item) => {
+    const timestamp = await getLastCommitTimestamp({ owner: item.repo.owner, name: item.repo.name });
+    //将获取到的时间添加到当前数据中
     return {
-      ...repo,
+      ...item.repo,
       lastCommitTimestamp: timestamp,
     };
   });
 
-  const finalRepos = await Promise.all(promises);
-  console.log('get star repositorys :', finalRepos);
-  return finalRepos;
+  // 使用 Promise.all 等待所有提交时间获取完成
+  const reposWithTimestamps = await Promise.all(timestampPromises);
+    // Extract relevant data, including forks_count
+  const formattedRepos = reposWithTimestamps.map(item => ({
+      id: item.id,
+      name: item.name,
+      full_name: item.full_name,
+      description: item.description,
+      html_url: item.html_url,
+      stargazers_count: item.stargazers_count,
+      forks_count: item.forks_count,
+      lastCommitTimestamp: item.lastCommitTimestamp,
+      language: item.language,
+      owner: item.owner,
+  }));
+
+
+  console.log('get star repositorys :', formattedRepos);
+  return formattedRepos;
 }
 
 export async function getRepositoryReadme(params) {
