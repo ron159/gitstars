@@ -13,9 +13,21 @@ export async function getLastCommitTimestamp(repository) {
       return null;
     }
     
-    const url = `/repos/${owner.login}/${name}/commits`;
-    console.log('Fetching commits from:', url);
-    const res = await httpRequestGithub.get(url, {
+    // 首先检查仓库是否存在
+    const repoUrl = `/repos/${owner.login}/${name}`;
+    try {
+      await httpRequestGithub.get(repoUrl);
+    } catch (error) {
+      if (error.response?.status === 404) {
+        console.error('Repository not found:', repoUrl);
+        return null;
+      }
+      throw error;
+    }
+    
+    const commitsUrl = `/repos/${owner.login}/${name}/commits`;
+    console.log('Fetching commits from:', commitsUrl);
+    const res = await httpRequestGithub.get(commitsUrl, {
       params: {
         sha: 'main', // 默认使用main分支
         per_page: 1  // 只获取最新的commit
