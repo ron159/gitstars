@@ -24,7 +24,10 @@ export default async (request, context) => {
   try {
     const res = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
-      body: JSON.stringify(requestBody),
+      body: JSON.stringify({
+        ...requestBody,
+        scope: 'repo' // 添加repo scope以访问私有仓库信息
+      }),
       headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
