@@ -11,6 +11,11 @@ import VueVirtualScroller from 'vue-virtual-scroller';
 import { throttle } from 'lodash';
 import { createI18nByLocale } from './i18n';
 
+function onAppError(error) {
+  console.error('应用程序错误:', error);
+  alert(`登录失败: ${error.message || '未知错误'}`);
+}
+
 function onResize() {
   let fontSize = window.innerWidth / 100;
   if (fontSize < 12) {

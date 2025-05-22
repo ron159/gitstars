@@ -1,36 +1,33 @@
 <template>
   <header
-    class="flex h-16 flex-none items-center justify-between gap-2 border-b border-solid border-b-gray-300 bg-white px-4"
+    class="flex h-16 flex-none items-center justify-between gap-2 border-b border-solid border-apple-gray-200 bg-white px-6 backdrop-blur-md bg-opacity-90"
   >
     <div class="flex items-center">
-      <a :href="userinfo.html_url" rel="noopener noreferrer">
-        <img :src="userinfo.avatar_url" alt="" class="w-10 rounded-full" />
+      <a :href="userinfo.html_url" rel="noopener noreferrer" class="transition-opacity duration-300 hover:opacity-80">
+        <img :src="userinfo.avatar_url" alt="" class="w-10 h-10 rounded-full object-cover border border-apple-gray-100 shadow-sm" />
       </a>
 
       <a
         :href="`${userinfo.html_url}?tab=repositories`"
         rel="noopener noreferrer"
-        class="ml-3 text-xl font-bold text-[#948aec] hover:underline"
+        class="ml-3 text-xl font-sf-pro-display font-semibold text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors duration-300"
       >
-        <h2>
+        <h2 class="flex items-center">
           {{ $t('userTitle', { username: userinfo.name }) }}
-          <svg-icon name="share" class="text-sm" />
+          <svg-icon name="share" class="ml-1 text-sm text-[var(--primary)]" />
         </h2>
       </a>
     </div>
 
     <span class="flex-auto"></span>
 
-    <span class="cursor-pointer" @click="handleChangeLang">
-      <svg-icon name="translate" class="text-xl" />
-      <span>· </span>
-      <span class="text-sm">{{ userStore.lang === 'zh' ? '中' : 'En' }}</span>
+    <span class="cursor-pointer flex items-center apple-button text-sm py-1 px-3" @click="handleChangeLang">
+      <svg-icon name="translate" class="text-lg mr-1" />
+      <span>{{ userStore.lang === 'zh' ? '中文' : 'English' }}</span>
     </span>
 
-    <span class="mt-0.5 h-4 w-px bg-gray-400"></span>
-
-    <a :href="BRAND_URI">
-      <svg-icon name="github" class="text-xl hover:opacity-50" />
+    <a :href="BRAND_URI" class="ml-4 flex items-center text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors duration-300">
+      <svg-icon name="github" class="text-xl" />
     </a>
   </header>
 </template>

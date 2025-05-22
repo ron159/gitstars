@@ -8,7 +8,8 @@ export async function getUserInfo() {
 export async function getLastCommitTimestamp(repository) {
   try {
     console.log('Repository object:', repository);
-    const { owner, name } = repository;
+    const owner = repository.owner;
+    const name = repository.name;
     if (!owner || !owner.login || !name) {
       console.error('Invalid repository object:', repository);
       return null;
@@ -137,10 +138,10 @@ export async function getStarredRepositories(params) {
 
   // 先创建一个 promises 数组来获取所有仓库的最后提交时间
   const timestampPromises = allRepos.map(async (item) => {
-    const timestamp = await getLastCommitTimestamp({ owner: item.repo.owner, name: item.repo.name });
+    const timestamp = await getLastCommitTimestamp(item);
     //将获取到的时间添加到当前数据中
     return {
-      ...item.repo,
+      ...item,
       lastCommitTimestamp: timestamp,
     };
   });

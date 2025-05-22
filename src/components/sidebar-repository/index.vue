@@ -1,6 +1,6 @@
 <template>
   <div
-    class="relative w-96 flex-none border-r border-solid border-r-gray-300 bg-white"
+    class="relative w-96 flex-none border-r border-solid border-apple-gray-200 bg-white"
   >
     <RepositorySearch />
 
@@ -9,13 +9,13 @@
       :items="repositoryStore.filteredRepositories"
       :min-item-size="100"
       key-field="id"
-      class="scrollbar-thumb:bg-slate-300 overflow-y-auto overflow-x-hidden"
+      class="overflow-y-auto overflow-x-hidden"
       style="height: calc(100% - 2.25rem)"
       @click="handleClickRepository"
     >
       <template v-slot="{ item, index, active }">
         <DynamicScrollerItem
-          class="cursor-pointer border-b border-solid border-b-gray-300 p-4"
+          class="cursor-pointer border-b border-solid border-apple-gray-100 px-6 py-5 transition-all duration-200"
           :item="item"
           :active="active"
           :size-dependencies="[
@@ -35,11 +35,16 @@
       </template>
     </DynamicScroller>
 
-    <svg-icon
+    <div 
       v-show="tagStore.tagSrc === 'star' && repositoryStore.all.length === 0"
-      name="loading"
-      class="absolute left-1/2 top-1/3 -ml-3 animate-spin text-2xl text-gray-300"
-    />
+      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center justify-center"
+    >
+      <svg-icon
+        name="loading"
+        class="animate-spin text-3xl text-[var(--primary)] mb-4"
+      />
+      <p class="text-[var(--text-secondary)] text-sm">加载中...</p>
+    </div>
   </div>
 </template>
 
@@ -77,11 +82,15 @@ repositoryStore.resolveRepositories();
 
 <style scoped>
 .selected {
-  background-color: #f7f7f7;
-  box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--background-light);
+  border-left: 3px solid var(--primary);
 }
 
 :deep(.vue-recycle-scroller__item-wrapper) {
   overflow: visible;
+}
+
+:deep(.selected:hover) {
+  background-color: var(--background-light);
 }
 </style>

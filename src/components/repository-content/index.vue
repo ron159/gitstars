@@ -2,47 +2,53 @@
   <div class="relative flex-auto bg-white" style="width: calc(100% - 24rem)">
     <header
       v-if="selectedRepository"
-      class="broder-b-gray-300 flex h-9 items-center border-b border-solid px-4"
+      class="flex h-12 items-center border-b border-solid border-apple-gray-200 px-6 bg-apple-gray-50"
     >
       <a
         :href="toRepositoryHref(selectedRepository)"
-        class="inline-flex items-center hover:underline"
+        class="inline-flex items-center text-[var(--text-primary)] hover:text-[var(--primary)] transition-colors duration-300"
         rel="noopener noreferrer"
       >
-<h2 class="text-lg font-bold">
-  <svg-icon name="github" class="text-xl" />
-  {{ selectedRepository?.owner.login }} /
-  {{ selectedRepository?.name }}
-  <svg-icon name="share" class="text-sm" />
-  <span class="ml-2 text-sm text-gray-500">
-    Last commit: {{ lastCommitTimestamp }}
-  </span>
-</h2>
+        <h2 class="font-sf-pro-display font-semibold">
+          <svg-icon name="github" class="mr-1 text-xl" />
+          <span class="font-medium">{{ selectedRepository?.owner.login }}</span> / 
+          <span class="font-bold">{{ selectedRepository?.name }}</span>
+          <svg-icon name="share" class="ml-1 text-sm text-[var(--primary)]" />
+        </h2>
       </a>
+      
+      <span class="ml-4 text-sm text-[var(--text-secondary)] flex items-center" v-if="lastCommitTimestamp">
+        <svg-icon name="clock" class="mr-1" />
+        最后提交: {{ lastCommitTimestamp }}
+      </span>
     </header>
 
     <div
       v-show="!readme"
-      class="relative top-1/3 mx-auto w-60 text-center text-gray-300"
+      class="flex flex-col items-center justify-center h-full"
     >
-      <p class="mb-2 text-3xl font-bold">README.md</p>
-      <p
-        v-if="!selectedRepository"
-        class="flex items-center justify-center text-sm"
-      >
-        <svg-icon name="hand-left" class="mr-1 text-base" />{{
-          $t('readmeTip')
-        }}
-      </p>
-      <svg-icon v-show="loading" name="loading" class="animate-spin text-2xl" />
+      <div class="text-center">
+        <p class="mb-4 text-3xl font-sf-pro-display font-bold text-apple-gray-300">README.md</p>
+        <p
+          v-if="!selectedRepository"
+          class="flex items-center justify-center text-sm text-[var(--text-secondary)]"
+        >
+          <svg-icon name="hand-left" class="mr-2 text-base" />{{
+            $t('readmeTip')
+          }}
+        </p>
+        <div v-show="loading" class="mt-6">
+          <svg-icon name="loading" class="animate-spin text-2xl text-[var(--primary)]" />
+        </div>
+      </div>
     </div>
 
     <article
       v-show="readme"
       v-html="readme"
       ref="refReadme"
-      class="markdown-body overflow-y-auto p-5 text-sm"
-      style="height: calc(100% - 2.75rem)"
+      class="markdown-body overflow-y-auto p-8 text-sm bg-white"
+      style="height: calc(100% - 3rem)"
     />
   </div>
 </template>
@@ -120,13 +126,13 @@ watchEffect(async () => {
       return (a + b).replace('/blob/', '/raw/');
     });
 
-const timestamp = await getLastCommitTimestamp(selectedRepository.value);
-if (timestamp) {
-  const date = new Date(timestamp);
-  lastCommitTimestamp.value = date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
-} else {
-  lastCommitTimestamp.value = 'No commits found';
-}
+  const timestamp = await getLastCommitTimestamp(selectedRepository.value);
+  if (timestamp) {
+    const date = new Date(timestamp);
+    lastCommitTimestamp.value = date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
+  } else {
+    lastCommitTimestamp.value = '未找到提交记录';
+  }
 
   nextTick(() => {
     refReadme.value.scrollTo({ top: 0 });
@@ -142,9 +148,29 @@ const toRepositoryHref = (repository) =>
 <style>
 .markdown-body {
   font-size: 14px;
+  font-family: var(--sf-pro, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif);
+  color: var(--text-primary);
+  line-height: 1.6;
 }
 
 .markdown-body img {
   display: inline;
+  border-radius: 6px;
+}
+
+.markdown-body pre {
+  background-color: var(--background-light) !important;
+  border-radius: 8px;
+}
+
+.markdown-body code {
+  font-family: var(--sf-mono, 'SF Mono', SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', monospace);
+}
+
+.markdown-body h1, .markdown-body h2, .markdown-body h3, 
+.markdown-body h4, .markdown-body h5, .markdown-body h6 {
+  font-family: var(--sf-pro-display, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif);
+  font-weight: 600;
+  color: var(--text-primary);
 }
 </style>

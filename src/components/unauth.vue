@@ -1,25 +1,22 @@
 <template>
-  <div class="unauth h-full w-full">
-    <div class="wrapper h-full">
-      <div
-        class="absolute left-1/2 top-1/2 w-[540px] -translate-x-1/2 -translate-y-1/2 rounded-lg bg-[#000c] py-10"
-      >
-        <h1
-          class="brand-text mb-12 flex justify-center font-['gitstars'] text-7xl font-bold uppercase text-[#948aec]"
-        >
-          <svg-icon name="logo" class="mr-1" />
-          {{ BRAND }}
-        </h1>
-
-        <a
-          class="mx-auto flex w-72 items-center justify-center rounded-md bg-gray-100 px-5 py-3 text-center text-base hover:bg-gray-200 hover:underline"
-          :href="authURL"
-          target="_self"
-        >
-          <svg-icon name="github" class="mr-2 text-xl" />
-          <span>{{ $t('loginTip') }}</span>
-        </a>
+  <div class="unauth h-full w-full bg-[var(--background-light)] flex flex-col items-center justify-center">
+    <div class="max-w-4xl mx-auto text-center px-6 py-16">
+      <h1 class="apple-heading text-6xl mb-4 tracking-tight">{{ BRAND }}</h1>
+      <p class="apple-subheading text-xl mb-12 max-w-2xl mx-auto">管理和发现您的GitHub收藏，以全新的方式组织和探索您关注的项目。</p>
+      
+      <div class="apple-card p-8 mb-12 max-w-3xl mx-auto">
+        <img src="/example-your-stars.png" alt="Screenshot" class="w-full rounded-lg shadow-lg mb-8" />
+        <p class="text-lg text-[var(--text-secondary)] mb-6">更简洁、更优雅的界面，帮助您高效管理GitHub星标。</p>
       </div>
+      
+      <a
+        class="apple-button inline-flex items-center justify-center text-base"
+        :href="authURL"
+        target="_self"
+      >
+        <svg-icon name="github" class="mr-2 text-xl" />
+        <span>{{ $t('loginTip') }}</span>
+      </a>
     </div>
   </div>
 </template>
@@ -34,10 +31,7 @@ const authURL = `https://github.com/login/oauth/authorize?client_id=${
 
 <style scoped>
 .unauth {
-  background-image: linear-gradient(45deg, #948aec 0%, #76d0a3 100%);
-}
-
-.wrapper {
-  background: url(/example-your-stars.png) no-repeat center/contain;
+  background-color: var(--background-light);
+  background-image: linear-gradient(180deg, #ffffff 0%, var(--background-light) 100%);
 }
 </style>

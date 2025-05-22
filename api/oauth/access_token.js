@@ -18,7 +18,7 @@ export default async (request, context) => {
 
   const requestBody = await request.json();
   if (!requestBody.client_secret) {
-    requestBody.client_secret = process.env.VITE_GITSTARS_CLIENT_SECRET;
+    requestBody.client_secret = process.env.GITSTARS_CLIENT_SECRET;
   }
 
   try {
