@@ -5,20 +5,16 @@
 如果您遇到以下错误信息：
 
 ```
-登录失败: incorrect_client_credentials. The client_id and/or client_secret passed are incorrect.
+登录失败: 请求失败，状态码: 500，服务器配置错误：缺少客户端密钥。请在服务器上设置GITSTARS_CLIENT_SECRET环境变量
 ```
 
-或
+这表示GitHub OAuth认证配置存在问题，需要设置GitHub客户端密钥。
 
-```
-登录失败: Request failed with status code 500
-```
+## 解决方案 (推荐方法)
 
-这表示GitHub OAuth认证配置存在问题。请按照以下步骤设置。
+我们提供了一个简单的脚本来更新GitHub客户端密钥，只需两个步骤：
 
-## 解决方案
-
-### 1. 创建GitHub OAuth应用
+### 1. 获取GitHub OAuth应用的客户端密钥
 
 1. 登录您的GitHub账户
 2. 转到 [GitHub Developer Settings](https://github.com/settings/developers)
@@ -29,10 +25,30 @@
    - Application description: (可选) GitHub星标管理工具
    - Authorization callback URL: 与Homepage URL相同 (例如 http://localhost:30000)
 5. 点击"Register application"
-6. 创建成功后，您将看到Client ID
-7. 点击"Generate a new client secret"生成密钥
+6. 创建成功后，点击"Generate a new client secret"生成密钥
+7. 复制生成的客户端密钥
 
-### 2. 设置环境变量
+### 2. 使用更新脚本设置密钥
+
+执行以下命令，将YOUR_CLIENT_SECRET替换为您的GitHub客户端密钥：
+
+```bash
+node update-secret.js YOUR_CLIENT_SECRET
+```
+
+成功后，您将看到"GitHub客户端密钥已成功更新！"的消息。
+
+### 3. 启动应用
+
+```bash
+npm run dev
+```
+
+## 替代方案
+
+如果您不想使用硬编码的密钥，还可以通过以下两种方式设置：
+
+### 方法1: 使用环境变量
 
 在项目根目录创建`.env`文件：
 
@@ -50,36 +66,35 @@ GITSTARS_CLIENT_SECRET=您的客户端密钥
 API_PORT=3030
 ```
 
-### 3. 安装依赖
-
-本地API服务器需要一些额外的依赖：
+### 方法2: 使用命令行设置环境变量
 
 ```bash
-npm install express cors axios dotenv http-proxy-middleware
-```
+# Linux/Mac
+export GITSTARS_CLIENT_SECRET=您的客户端密钥
+npm run dev
 
-### 4. 启动本地API服务器
-
-在一个单独的终端窗口中运行：
-
-```bash
-node local-api-server.js
-```
-
-如果一切正常，您应该看到以下输出：
-
-```
-本地API服务器运行在 http://localhost:3030
-环境变量状态: GITSTARS_CLIENT_SECRET 已设置
-```
-
-### 5. 启动前端应用
-
-在另一个终端窗口中运行：
-
-```bash
+# Windows
+set GITSTARS_CLIENT_SECRET=您的客户端密钥
 npm run dev
 ```
+
+## 故障排除
+
+如果您仍然遇到问题，请检查：
+
+1. **客户端ID是否正确设置**
+   - 确保`.env`文件中的`VITE_GITSTARS_CLIENT_ID`已正确设置
+   - 或在`src/components/unauth.vue`中硬编码正确的客户端ID
+
+2. **客户端密钥是否正确**
+   - 确保没有多余的空格或换行符
+   - 尝试重新生成客户端密钥
+
+3. **浏览器控制台错误**
+   - 打开浏览器开发者工具，检查控制台是否有错误信息
+
+4. **redirect_uri_mismatch错误**
+   - 确保GitHub OAuth应用设置中的回调URL与应用实际URL匹配
 
 ## 测试配置
 
