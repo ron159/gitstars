@@ -5,7 +5,7 @@
 如果您遇到以下错误信息：
 
 ```
-登录失败: 请求失败，状态码: 500，服务器配置错误：缺少客户端密钥。请在服务器上设置GITSTARS_CLIENT_SECRET环境变量。
+登录失败: 请求失败，状态码: 500，服务器配置错误：缺少客户端密钥。请在服务器上设置VITE_GITSTARS_CLIENT_SECRET或GITSTARS_CLIENT_SECRET环境变量。
 ```
 
 这表示GitHub OAuth认证配置存在问题，需要设置GitHub客户端密钥。
@@ -38,7 +38,9 @@
 # 前端环境变量 - GitHub OAuth应用客户端ID
 VITE_GITSTARS_CLIENT_ID=您的客户端ID
 
-# 后端环境变量 - GitHub OAuth应用客户端密钥
+# GitHub OAuth应用客户端密钥 (以下两种方式任选其一)
+VITE_GITSTARS_CLIENT_SECRET=您的客户端密钥
+# 或者
 GITSTARS_CLIENT_SECRET=您的客户端密钥
 ```
 
@@ -46,10 +48,14 @@ GITSTARS_CLIENT_SECRET=您的客户端密钥
 
 ```bash
 # Linux/Mac
+export VITE_GITSTARS_CLIENT_SECRET=您的客户端密钥
+# 或者
 export GITSTARS_CLIENT_SECRET=您的客户端密钥
 npm run dev
 
 # Windows
+set VITE_GITSTARS_CLIENT_SECRET=您的客户端密钥
+# 或者
 set GITSTARS_CLIENT_SECRET=您的客户端密钥
 npm run dev
 ```
@@ -90,7 +96,7 @@ npm run dev
 
 1. **环境变量是否正确设置**
    - 检查`.env`文件中的变量是否正确
-   - 特别注意`GITSTARS_CLIENT_SECRET`是否已设置
+   - 特别注意`VITE_GITSTARS_CLIENT_SECRET`或`GITSTARS_CLIENT_SECRET`是否已设置
 
 2. **incorrect_client_credentials错误**
    - 检查客户端ID和密钥是否正确复制
