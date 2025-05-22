@@ -8,7 +8,13 @@
 登录失败: incorrect_client_credentials. The client_id and/or client_secret passed are incorrect.
 ```
 
-这表示您的GitHub OAuth应用配置不正确。请按照以下步骤设置。
+或
+
+```
+登录失败: Request failed with status code 500
+```
+
+这表示GitHub OAuth认证配置存在问题。请按照以下步骤设置。
 
 ## 解决方案
 
@@ -28,41 +34,48 @@
 
 ### 2. 设置环境变量
 
-#### 方法一：创建.env文件
-
 在项目根目录创建`.env`文件：
 
 ```
-# GitHub OAuth应用配置
+# 前端环境变量 - GitHub OAuth应用客户端ID
 VITE_GITSTARS_CLIENT_ID=您的客户端ID
+
+# 本地API服务器配置
+VITE_API_PROXY=http://localhost:3030
+
+# 后端环境变量 - GitHub OAuth应用客户端密钥
 GITSTARS_CLIENT_SECRET=您的客户端密钥
+
+# API服务器端口 (可选，默认3030)
+API_PORT=3030
 ```
 
-#### 方法二：使用命令行
+### 3. 安装依赖
 
-对于前端环境变量：
+本地API服务器需要一些额外的依赖：
 
 ```bash
-# Linux/Mac
-export VITE_GITSTARS_CLIENT_ID=您的客户端ID
-
-# Windows
-set VITE_GITSTARS_CLIENT_ID=您的客户端ID
+npm install express cors axios dotenv http-proxy-middleware
 ```
 
-对于后端环境变量：
+### 4. 启动本地API服务器
+
+在一个单独的终端窗口中运行：
 
 ```bash
-# Linux/Mac
-export GITSTARS_CLIENT_SECRET=您的客户端密钥
-
-# Windows
-set GITSTARS_CLIENT_SECRET=您的客户端密钥
+node local-api-server.js
 ```
 
-### 3. 重启应用
+如果一切正常，您应该看到以下输出：
 
-设置环境变量后，请重启应用：
+```
+本地API服务器运行在 http://localhost:3030
+环境变量状态: GITSTARS_CLIENT_SECRET 已设置
+```
+
+### 5. 启动前端应用
+
+在另一个终端窗口中运行：
 
 ```bash
 npm run dev
@@ -70,14 +83,38 @@ npm run dev
 
 ## 测试配置
 
-配置完成后，点击"GitHub APP 授权登录"按钮，系统应能正常跳转到GitHub授权页面。
+配置完成后，点击"GitHub APP 授权登录"按钮，系统应能正常跳转到GitHub授权页面并完成认证。
 
-## 常见问题
+## 常见问题排查
+
+### 状态码500错误
+
+如果您看到"Request failed with status code 500"错误，请检查：
+
+1. **本地API服务器是否运行**
+   - 确保您已经启动了`local-api-server.js`
+   - 检查控制台是否有错误信息
+
+2. **环境变量是否正确设置**
+   - 检查`.env`文件中的变量是否正确
+   - 特别注意`GITSTARS_CLIENT_SECRET`是否已设置
+
+3. **代理配置是否正确**
+   - 确保`VITE_API_PROXY`设置为本地API服务器地址（默认为`http://localhost:3030`）
+
+### 浏览器开发者工具
+
+如遇问题，请打开浏览器开发者工具的网络和控制台面板，查看请求和响应详情：
+
+1. 查找`/api/oauth/access_token`请求
+2. 检查请求是否包含正确的`client_id`和`code`
+3. 检查响应状态和错误消息
+
+### 其他常见问题
 
 1. **环境变量未生效**
-   - 确保.env文件在正确位置
-   - 确保您的应用能够读取这些环境变量
-   - 尝试直接在启动命令中设置环境变量：`VITE_GITSTARS_CLIENT_ID=xxx npm run dev`
+   - 确保`.env`文件在正确位置
+   - 重启应用和API服务器
 
 2. **redirect_uri_mismatch错误**
    - 确保GitHub OAuth应用设置中的回调URL与应用实际URL匹配
