@@ -51,19 +51,24 @@
   <div class="my-3 text-sm text-[var(--text-secondary)] leading-relaxed">{{ repository.description }}</div>
 
   <div class="flex justify-between items-center text-xs font-medium text-apple-gray-500">
-    <div class="flex items-center">
+    <div class="flex items-center flex-wrap">
       <span class="inline-flex items-center mr-3 bg-apple-gray-100 px-2 py-1 rounded-md">
         <svg-icon name="star-fill" class="mr-1 text-[var(--primary)]" />
         <span>{{ repository.stargazers_count }}</span>
       </span>
 
-      <span class="inline-flex items-center bg-apple-gray-100 px-2 py-1 rounded-md">
+      <span class="inline-flex items-center mr-3 bg-apple-gray-100 px-2 py-1 rounded-md">
         <svg-icon name="branch" class="mr-1 text-[var(--primary)]" />
         <span>{{ repository.forks_count }}</span>
       </span>
+      
+      <span v-if="repository.lastCommitTimestamp" class="inline-flex items-center bg-apple-gray-100 px-2 py-1 rounded-md mt-2 md:mt-0">
+        <svg-icon name="clock" class="mr-1 text-[var(--primary)]" />
+        <span>{{ formatDate(repository.lastCommitTimestamp) }}</span>
+      </span>
     </div>
 
-    <span class="px-2 py-1 bg-apple-gray-100 rounded-md">{{ repository.language }}</span>
+    <span class="px-2 py-1 bg-apple-gray-100 rounded-md ml-2">{{ repository.language }}</span>
   </div>
 </template>
 
@@ -85,6 +90,12 @@ const medalMap = {
 };
 const tagStore = useTagStore();
 const disableTopic = computed(() => tagStore.tagSrc !== 'star');
+
+function formatDate(timestamp) {
+  if (!timestamp) return '';
+  const date = new Date(timestamp);
+  return date.toISOString().split('T')[0];
+}
 
 function handleClickTopic(e) {
   if (disableTopic.value) return;

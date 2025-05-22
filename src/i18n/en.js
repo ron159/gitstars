@@ -17,6 +17,7 @@ export default {
     sort: {
       star: 'Sort by star',
       time: 'Sort by time',
+      commit: 'Sort by last commit',
     },
     updating: 'Updating repository',
   },

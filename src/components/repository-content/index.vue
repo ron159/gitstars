@@ -16,11 +16,6 @@
           <svg-icon name="share" class="ml-1 text-sm text-[var(--primary)]" />
         </h2>
       </a>
-      
-      <span class="ml-4 text-sm text-[var(--text-secondary)] flex items-center" v-if="lastCommitTimestamp">
-        <svg-icon name="clock" class="mr-1" />
-        最后提交: {{ lastCommitTimestamp }}
-      </span>
     </header>
 
     <div
@@ -57,20 +52,18 @@
 import { watchEffect, ref, nextTick } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useRepositoryStore } from '@/store/repository';
-import { getRepositoryReadme, getReadmeByMarkdown, getLastCommitTimestamp } from '@/server/github';
+import { getRepositoryReadme, getReadmeByMarkdown } from '@/server/github';
 import { toRepostoryReadmeHref } from './tool';
 
 const { selectedRepository } = storeToRefs(useRepositoryStore());
 const readme = ref('');
 const refReadme = ref(null);
 const loading = ref(false);
-const lastCommitTimestamp = ref('');
 
 watchEffect(async () => {
   if (!selectedRepository.value) return;
   readme.value = '';
   loading.value = true;
-  lastCommitTimestamp.value = '';
 
   // 暂存 repository id
   const { id } = selectedRepository.value;
@@ -125,14 +118,6 @@ watchEffect(async () => {
       const b = toRepostoryReadmeHref(p1, { urlPrefix });
       return (a + b).replace('/blob/', '/raw/');
     });
-
-  const timestamp = await getLastCommitTimestamp(selectedRepository.value);
-  if (timestamp) {
-    const date = new Date(timestamp);
-    lastCommitTimestamp.value = date.toISOString().replace('T', ' ').replace(/\.\d{3}Z$/, '');
-  } else {
-    lastCommitTimestamp.value = '未找到提交记录';
-  }
 
   nextTick(() => {
     refReadme.value.scrollTo({ top: 0 });

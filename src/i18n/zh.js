@@ -17,6 +17,7 @@ export default {
     sort: {
       star: '按星标排序',
       time: '按时间排序',
+      commit: '按最后提交排序',
     },
     updating: '存储库更新中',
   },

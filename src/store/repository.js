@@ -52,7 +52,7 @@ export const useRepositoryStore = defineStore('repository', {
     loading: true,
     /**
      * repositories 排序
-     * time 或 star
+     * time 或 star 或 commit
      */
     sortType: 'time',
   }),
@@ -126,14 +126,22 @@ export const useRepositoryStore = defineStore('repository', {
       /**
        * 根据当前排序类型对当前展示的 repositories 排序
        * repositories 默认已经按 star 时间排序
-       * 只需处理按 star 数量排序
+       * 只需处理按 star 数量排序和最后提交时间排序
        */
       if (
         tagStore.tagSrc === 'star' &&
-        repositoriesTmp.length > 0 &&
-        state.sortType === 'star'
+        repositoriesTmp.length > 0
       ) {
-        repositoriesTmp.sort((a, b) => b.stargazers_count - a.stargazers_count);
+        if (state.sortType === 'star') {
+          repositoriesTmp.sort((a, b) => b.stargazers_count - a.stargazers_count);
+        } else if (state.sortType === 'commit') {
+          repositoriesTmp.sort((a, b) => {
+            // 如果没有最后提交时间，则排在最后
+            if (!a.lastCommitTimestamp) return 1;
+            if (!b.lastCommitTimestamp) return -1;
+            return new Date(b.lastCommitTimestamp) - new Date(a.lastCommitTimestamp);
+          });
+        }
       }
 
       return repositoriesTmp;
