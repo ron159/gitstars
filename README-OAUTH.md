@@ -5,14 +5,12 @@
 如果您遇到以下错误信息：
 
 ```
-登录失败: 请求失败，状态码: 500，服务器配置错误：缺少客户端密钥。请在服务器上设置GITSTARS_CLIENT_SECRET环境变量
+登录失败: 请求失败，状态码: 500，服务器配置错误：缺少客户端密钥。请在服务器上设置GITSTARS_CLIENT_SECRET环境变量。
 ```
 
 这表示GitHub OAuth认证配置存在问题，需要设置GitHub客户端密钥。
 
-## 解决方案 (推荐方法)
-
-我们提供了一个简单的脚本来更新GitHub客户端密钥，只需两个步骤：
+## 解决方案
 
 ### 1. 获取GitHub OAuth应用的客户端密钥
 
@@ -21,34 +19,18 @@
 3. 点击"New OAuth App"按钮
 4. 填写应用信息：
    - Application name: GitStars (或您喜欢的其他名称)
-   - Homepage URL: 您的应用URL (例如 http://localhost:30000)
+   - Homepage URL: 您的应用URL (例如 http://localhost:3000)
    - Application description: (可选) GitHub星标管理工具
-   - Authorization callback URL: 与Homepage URL相同 (例如 http://localhost:30000)
+   - Authorization callback URL: 与Homepage URL相同 (例如 http://localhost:3000)
 5. 点击"Register application"
 6. 创建成功后，点击"Generate a new client secret"生成密钥
 7. 复制生成的客户端密钥
 
-### 2. 使用更新脚本设置密钥
+### 2. 设置环境变量
 
-执行以下命令，将YOUR_CLIENT_SECRET替换为您的GitHub客户端密钥：
+您可以通过以下两种方式设置环境变量：
 
-```bash
-node update-secret.js YOUR_CLIENT_SECRET
-```
-
-成功后，您将看到"GitHub客户端密钥已成功更新！"的消息。
-
-### 3. 启动应用
-
-```bash
-npm run dev
-```
-
-## 替代方案
-
-如果您不想使用硬编码的密钥，还可以通过以下两种方式设置：
-
-### 方法1: 使用环境变量
+#### 方法1: 使用.env文件（推荐）
 
 在项目根目录创建`.env`文件：
 
@@ -56,17 +38,11 @@ npm run dev
 # 前端环境变量 - GitHub OAuth应用客户端ID
 VITE_GITSTARS_CLIENT_ID=您的客户端ID
 
-# 本地API服务器配置
-VITE_API_PROXY=http://localhost:3030
-
 # 后端环境变量 - GitHub OAuth应用客户端密钥
 GITSTARS_CLIENT_SECRET=您的客户端密钥
-
-# API服务器端口 (可选，默认3030)
-API_PORT=3030
 ```
 
-### 方法2: 使用命令行设置环境变量
+#### 方法2: 使用命令行设置环境变量
 
 ```bash
 # Linux/Mac
@@ -75,6 +51,12 @@ npm run dev
 
 # Windows
 set GITSTARS_CLIENT_SECRET=您的客户端密钥
+npm run dev
+```
+
+### 3. 启动应用
+
+```bash
 npm run dev
 ```
 
@@ -106,35 +88,11 @@ npm run dev
 
 如果您看到"Request failed with status code 500"错误，请检查：
 
-1. **本地API服务器是否运行**
-   - 确保您已经启动了`local-api-server.js`
-   - 检查控制台是否有错误信息
-
-2. **环境变量是否正确设置**
+1. **环境变量是否正确设置**
    - 检查`.env`文件中的变量是否正确
    - 特别注意`GITSTARS_CLIENT_SECRET`是否已设置
 
-3. **代理配置是否正确**
-   - 确保`VITE_API_PROXY`设置为本地API服务器地址（默认为`http://localhost:3030`）
-
-### 浏览器开发者工具
-
-如遇问题，请打开浏览器开发者工具的网络和控制台面板，查看请求和响应详情：
-
-1. 查找`/api/oauth/access_token`请求
-2. 检查请求是否包含正确的`client_id`和`code`
-3. 检查响应状态和错误消息
-
-### 其他常见问题
-
-1. **环境变量未生效**
-   - 确保`.env`文件在正确位置
-   - 重启应用和API服务器
-
-2. **redirect_uri_mismatch错误**
-   - 确保GitHub OAuth应用设置中的回调URL与应用实际URL匹配
-
-3. **依然显示incorrect_client_credentials错误**
+2. **incorrect_client_credentials错误**
    - 检查客户端ID和密钥是否正确复制
    - 确保没有多余的空格或换行符
    - 尝试重新生成客户端密钥 
