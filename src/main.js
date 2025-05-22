@@ -13,7 +13,18 @@ import { createI18nByLocale } from './i18n';
 
 function onAppError(error) {
   console.error('应用程序错误:', error);
-  alert(`登录失败: ${error.message || '未知错误'}`);
+  let errorMessage = error.message || '未知错误';
+  
+  // 提供更友好的错误信息
+  if (errorMessage.includes('incorrect_client_credentials')) {
+    errorMessage = '客户端凭据不正确。请确保已正确设置GitHub OAuth应用的客户端ID和密钥。';
+  } else if (errorMessage.includes('server_configuration_error')) {
+    errorMessage = '服务器配置错误。请联系管理员检查环境变量配置。';
+  } else if (errorMessage.includes('missing_client_id')) {
+    errorMessage = '缺少GitHub客户端ID。请检查前端环境变量VITE_GITSTARS_CLIENT_ID是否已设置。';
+  }
+  
+  alert(`登录失败: ${errorMessage}`);
 }
 
 function onResize() {

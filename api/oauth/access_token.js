@@ -17,11 +17,47 @@ export default async (request, context) => {
   }
 
   const requestBody = await request.json();
+  
+  // 检查客户端密钥
   if (!requestBody.client_secret) {
-    requestBody.client_secret = process.env.GITSTARS_CLIENT_SECRET;
+    const clientSecret = process.env.GITSTARS_CLIENT_SECRET;
+    if (!clientSecret) {
+      console.error('缺少GITSTARS_CLIENT_SECRET环境变量');
+      return new Response(JSON.stringify({
+        error: 'server_configuration_error',
+        error_description: '服务器配置错误：缺少客户端密钥。请在服务器上设置GITSTARS_CLIENT_SECRET环境变量。'
+      }), {
+        status: 500,
+        headers: {
+          'Content-Type': 'application/json',
+          ...CORS_HEADERS
+        }
+      });
+    }
+    requestBody.client_secret = clientSecret;
+  }
+
+  // 检查客户端ID
+  if (!requestBody.client_id) {
+    console.error('缺少client_id参数');
+    return new Response(JSON.stringify({
+      error: 'missing_client_id',
+      error_description: '请求中缺少client_id参数'
+    }), {
+      status: 400,
+      headers: {
+        'Content-Type': 'application/json',
+        ...CORS_HEADERS
+      }
+    });
   }
 
   try {
+    console.log('正在请求GitHub OAuth token，参数：', {
+      client_id: requestBody.client_id,
+      client_secret: '***' // 安全起见不打印实际值
+    });
+
     const res = await fetch('https://github.com/login/oauth/access_token', {
       method: 'POST',
       body: JSON.stringify({
@@ -35,12 +71,30 @@ export default async (request, context) => {
     });
 
     const data = await res.json();
+    
+    // 记录错误日志
+    if (data.error) {
+      console.error('GitHub OAuth错误:', data.error, data.error_description);
+    }
+    
     return new Response(JSON.stringify(data), {
       status: 200,
-      headers: CORS_HEADERS,
+      headers: {
+        'Content-Type': 'application/json',
+        ...CORS_HEADERS
+      }
     });
   } catch (e) {
-    console.error(e);
-    return new Response(e.message);
+    console.error('OAuth请求异常:', e);
+    return new Response(JSON.stringify({
+      error: 'oauth_request_failed',
+      error_description: e.message
+    }), {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+        ...CORS_HEADERS
+      }
+    });
   }
 };
